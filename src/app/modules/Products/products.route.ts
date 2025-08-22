@@ -20,13 +20,13 @@ router.get(
     productController.readAllProduct
 )
 router.get(
-    '/get-single-product',
+    '/get-single-product/:productId',
     productController.readSingleProduct
 )
 
 router.delete(
-    '/delete',
-    productController.deleteProduct
+  '/delete/:productId',
+  productController.deleteProduct
 )
 
 export const ProductRoute = router

@@ -63,7 +63,40 @@ const addToCart = async (req : Request, res : Response, next : NextFunction) => 
     }
     return sendResponse(res, {
             code: StatusCodes.OK,
-            message: "Cart Found Successfully.",
+            message: "Cart Add Item Successfully.",
+            data: result,
+        });
+}
+
+const deleteCart = async (req : Request, res : Response, next : NextFunction) => {
+    const {cartId} = req.params;
+    const result = cartService.deleteCartFromDB(cartId);
+    if (!result) {
+        return sendResponse(res, {
+                code: StatusCodes.BAD_REQUEST,
+                message: "Cart Not deleted!",
+            });
+    }
+    return sendResponse(res, {
+            code: StatusCodes.OK,
+            message: "Cart deleted Successfully.",
+            data: result,
+        });
+}
+
+const removeItemToCart = async (req : Request, res : Response, next : NextFunction) => {
+    const {cartId, productId} = req.params
+    
+    const result = await cartService.removeItemFromCart(cartId, productId);
+     if (!result) {
+        return sendResponse(res, {
+                code: StatusCodes.BAD_REQUEST,
+                message: "Cart Not found!",
+            });
+    }
+    return sendResponse(res, {
+            code: StatusCodes.OK,
+            message: "Cart remove Item Successfully.",
             data: result,
         });
 }
@@ -72,5 +105,7 @@ export const cartController = {
     createCart, 
     getCartById,
     getCartByToken,
-    addToCart
+    addToCart,
+    deleteCart,
+    removeItemToCart
 }

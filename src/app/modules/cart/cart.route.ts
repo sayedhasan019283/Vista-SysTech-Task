@@ -26,4 +26,14 @@ router.post(
     cartController.addToCart
 )
 
+router.delete(
+    '/delete/:cartId',
+    cartController.deleteCart
+)
+
+router.get(
+    '/remove-from-cart/:cartId/:productId',
+    cartController.removeItemToCart
+)
+
 export const cartRouter = router

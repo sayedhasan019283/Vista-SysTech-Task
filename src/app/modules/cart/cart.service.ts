@@ -132,9 +132,54 @@ const addToCartFromDB = async (cartId: string, payload: CreateCartPayload) => {
 };
 
 
+const deleteCartFromDB = async (cartId : string) => {
+    const result = await CartModel.findByIdAndDelete(cartId);
+    return result;
+}
+
+const removeItemFromCart = async (cartId: string, productId: string) => {
+    const cart = await CartModel.findById(cartId); 
+    if (!cart) {
+        throw new Error('Cart not found');
+    }
+
+    const productIdToCheck = new Types.ObjectId(productId);
+
+    // Check if the product exists in the cart
+    const productIndex = cart.items.findIndex(
+        (item) => item.productId.toString() === productIdToCheck.toString()
+    );
+
+    if (productIndex === -1) {
+        throw new Error('Product not found in cart');
+    }
+
+    // Remove the product from the items array
+    const removedItem = cart.items.splice(productIndex, 1)[0];
+
+    // Recalculate subTotal by subtracting the removed item price
+    const removedProductTotal = removedItem.quantity * Number(removedItem.price);
+    cart.subTotal -= removedProductTotal;
+
+    // Recalculate total by adjusting for any promoDiscountTotal
+    cart.total = cart.subTotal - cart.promoDiscountTotal;
+
+    console.log('Removed product:', removedItem);
+    console.log('Updated subTotal:', cart.subTotal);
+    console.log('Updated total:', cart.total);
+
+    // Save the updated cart after removal
+    await cart.save();
+
+    return cart;
+};
+
+
 export const cartService = {
     createCartFromDB,
     getCartByIdFromDB,
     getCartByTokenFromDB,
-    addToCartFromDB
+    addToCartFromDB,
+    deleteCartFromDB,
+    removeItemFromCart
 }

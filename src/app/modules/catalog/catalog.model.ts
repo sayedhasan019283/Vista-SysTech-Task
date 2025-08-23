@@ -1,14 +1,14 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { TProduct, TVariant } from './products.interface';
+import { TCatalog, TVariant } from './catalog.interface';
 
-// Define the product schema
+// Define the Catalog schema
 const variantSchema = new Schema<TVariant>({
   size: { type: String },
   color: { type: String },
   price: { type: Number, required: true },
 });
 
-const productSchema = new Schema<TProduct>({
+const CatalogSchema = new Schema<TCatalog>({
   name: { type: String, required: true },
   description: { type: String },
   category: { type: String },
@@ -18,4 +18,4 @@ const productSchema = new Schema<TProduct>({
 });
 
 // Create the model
-export const ProductModel = mongoose.model<TProduct>('Product', productSchema);
+export const CatalogModel = mongoose.model<TCatalog>('Catalog', CatalogSchema);

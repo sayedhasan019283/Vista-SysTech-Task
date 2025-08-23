@@ -1,16 +1,16 @@
 import { z } from 'zod';
 
-// Define the Zod schema for a product variant
+// Define the Zod schema for a Catalog variant
 const createVariantSchema = z.object({
   size: z.string().optional(),
   color: z.string().optional(),
   price: z.number().min(0, 'Price must be a positive number'),
 });
 
-// Define the Zod schema for a product
-const createProductSchema = z.object({
+// Define the Zod schema for a Catalog
+const createCatalogSchema = z.object({
   body : z.object({
-    name: z.string().min(1, 'Product name is required'),
+    name: z.string().min(1, 'Catalog name is required'),
   description: z.string().optional(),
   category: z.string().min(1, 'Category is required'),
   variants: z.array(createVariantSchema).min(1, 'At least one variant is required'),
@@ -25,9 +25,9 @@ const updateVariantSchema = z.object({
   price: z.number().min(0, 'Price must be a positive number').optional(), // Make price optional for PATCH
 });
 
-// Define the Zod schema for a product (for PATCH API)
-const updateProductSchema = z.object({
-  name: z.string().min(1, 'Product name is required').optional(),  // Allow name to be optional in PATCH
+// Define the Zod schema for a Catalog (for PATCH API)
+const updateCatalogSchema = z.object({
+  name: z.string().min(1, 'Catalog name is required').optional(),  // Allow name to be optional in PATCH
   description: z.string().optional(),  // Allow description to be optional
   category: z.string().min(1, 'Category is required').optional(),  // Allow category to be optional in PATCH
   variants: z.array(updateVariantSchema).min(1, 'At least one variant is required').optional(), // Allow variants to be optional
@@ -35,7 +35,7 @@ const updateProductSchema = z.object({
   updatedAt: z.date().optional(),  // updatedAt can be updated in PATCH but optional
 });
 
-export const ProductValidationSchema = {
-    createProductSchema,
-    updateProductSchema
+export const CatalogValidationSchema = {
+    createCatalogSchema,
+    updateCatalogSchema
 }

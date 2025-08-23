@@ -2,7 +2,7 @@ import express from 'express';
 import { AuthRoutes } from '../app/modules/Auth/auth.route';
 import { UserRoutes } from '../app/modules/user/user.route';
 import path from 'path';
-import { ProductRoute } from '../app/modules/Products/products.route';
+import { CatalogRoute } from '../app/modules/catalog/catalog.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -15,8 +15,8 @@ const apiRoutes = [
     route: UserRoutes,
   },
   {
-    path: '/product',
-    route: ProductRoute,
+    path: '/catalog',
+    route: CatalogRoute,
   }
 ];   
 

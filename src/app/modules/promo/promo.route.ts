@@ -17,7 +17,7 @@ router.get(
     promoController.readSinglePromo
 )
 router.patch(
-    '/update',
+    '/update/:promoId',
     promoController.updatePromo
 )
 router.delete(

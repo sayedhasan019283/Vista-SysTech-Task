@@ -109,9 +109,6 @@ router.get('/get-cart-by-token/:token', cartController.getCartByToken);
  *               quantity:
  *                 type: number
  *                 example: 5
- *               price:
- *                 type: number
- *                 example: 21.99
  *     responses:
  *       200:
  *         description: Item added to the cart successfully

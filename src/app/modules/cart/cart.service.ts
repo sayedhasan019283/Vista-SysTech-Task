@@ -73,72 +73,114 @@ const getCartByTokenFromDB = async (token : string) => {
 }
 
 
+// const addToCartFromDB = async (cartId: string, payload: CreateCartPayload) => {
+//     const { productId, quantity, variant } = payload;
+//     const cart = await CartModel.findById(cartId); 
+//     const productIdToCheck = new Types.ObjectId(productId);
+
+//     if (!cart) {
+//         throw new Error('Cart not found');
+//     }
+
+//     const product = await CatalogModel.findOne(productIdToCheck)
+//     if (!product) {
+//         throw new Error('product not found');
+//     }
+//     console.log("product=========>>>>>>>", product)
+//     // Check if the product already exists in the cart with the same variant
+//     const productExist = cart.items.find(
+//         (item) => item.productId.toString() === productIdToCheck.toString() && item.variant === variant
+//     );
+//     const productFind = product.variants.find(
+//   (item) => item.size!.toString() === variant
+// );
+
+// console.log("productFind=====>>>>", productFind)
+
+
+//     if (productExist) {
+//       console.log("Exiesttttttt===========", productExist)
+//         // Update the quantity if product exists
+//         const totalQuantity = productExist.quantity + quantity;
+        
+//         // Ensure price is a number
+//         const price = Number(productExist.price);
+        
+//         // Update quantity and recalculate total price
+//         productExist.quantity = totalQuantity;
+//         const totalPrice = totalQuantity * price;
+
+//         // Update cart total
+//         cart.subTotal = totalPrice - cart.promoDiscountTotal;
+//         cart.total = totalPrice;
+
+//         console.log('Total price:', totalPrice);
+
+//         // Save the updated cart after modifying the product
+//         await cart.save();  // Save the cart after updating quantity and recalculating totals
+//     } else {
+//         // If product does not exist, just push the payload data to the items array
+//         cart.items.push({
+//             productId: productIdToCheck,
+//             quantity,
+//             variant,
+//             price: productFind!.price, // assuming price is included in the payload
+//         });
+
+//         // Get the existing cart total
+//         const existingTotal = cart.total;
+
+//         // Add the new product's total to the existing total
+//         const newProductTotal = quantity * (Number(productFind!.price) || 0);
+//         cart.subTotal = existingTotal + newProductTotal - cart.promoDiscountTotal;
+//         cart.total = cart.subTotal;
+
+//         // Save the updated cart after adding the new item
+//         await cart.save();
+//     }
+
+//     console.log(cart);
+//     return cart;
+// };
+
 const addToCartFromDB = async (cartId: string, payload: CreateCartPayload) => {
     const { productId, quantity, variant } = payload;
     const cart = await CartModel.findById(cartId); 
-    const productIdToCheck = new Types.ObjectId(productId);
+    if (!cart) throw new Error('Cart not found');
+  // Convert string productId to ObjectId
+    const productObjectId = new Types.ObjectId(productId);
+    const product = await CatalogModel.findById(productId); 
+    if (!product) throw new Error('Product not found');
 
-    if (!cart) {
-        throw new Error('Cart not found');
-    }
-
-    const product = await CatalogModel.findOne(productIdToCheck)
-    if (!product) {
-        throw new Error('product not found');
-    }
-    console.log("product=========>>>>>>>", product)
-    // Check if the product already exists in the cart with the same variant
-    const productExist = cart.items.find(
-        (item) => item.productId.toString() === productIdToCheck.toString() && item.variant === variant
-    );
     const productFind = product.variants.find(
-  (item) => item.size!.toString() === variant
-);
+        (v) => v.size === variant
+    );
+    if (!productFind) throw new Error('Variant not found');
 
-console.log("productFind=====>>>>", productFind)
-
+    const productExist = cart.items.find(
+        (item) => item.productId.toString() === productId && item.variant === variant
+    );
 
     if (productExist) {
-        // Update the quantity if product exists
-        const totalQuantity = productExist.quantity + quantity;
-        
-        // Ensure price is a number
-        const price = Number(productExist.price);
-        
-        // Update quantity and recalculate total price
-        productExist.quantity = totalQuantity;
-        const totalPrice = totalQuantity * price;
-
-        // Update cart total
-        cart.subTotal = totalPrice - cart.promoDiscountTotal;
-        cart.total = totalPrice;
-
-        console.log('Total price:', totalPrice);
-
-        // Save the updated cart after modifying the product
-        await cart.save();  // Save the cart after updating quantity and recalculating totals
+        productExist.quantity += quantity;
     } else {
-        // If product does not exist, just push the payload data to the items array
         cart.items.push({
-            productId: productIdToCheck,
+            productId : productObjectId,
             quantity,
             variant,
-            price: productFind!.price, // assuming price is included in the payload
+            price: productFind.price,
         });
-
-        // Get the existing cart total
-        const existingTotal = cart.total;
-
-        // Add the new product's total to the existing total
-        const newProductTotal = quantity * (Number(productFind!.price) || 0);
-        cart.subTotal = existingTotal + newProductTotal - cart.promoDiscountTotal;
-        cart.total = cart.subTotal;
-
-        // Save the updated cart after adding the new item
-        await cart.save();
     }
 
-    console.log(cart);
+    // Recalculate subtotal for all items
+    cart.subTotal = cart.items.reduce(
+  (sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 0),
+  0
+);
+
+    cart.total = cart.subTotal - cart.promoDiscountTotal;
+
+    await cart.save();
     return cart;
 };
 

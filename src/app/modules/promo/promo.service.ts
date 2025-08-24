@@ -1,3 +1,4 @@
+import ApiError from "../../../errors/ApiError";
 import { CartModel } from "../cart/cart.model";
 import { TPromo } from "./promo.interface";
 import { PromoModel } from "./promo.model";
@@ -31,10 +32,14 @@ const checkPromoCode = async (payload: Partial<TPromo>, cartId: string) => {
     if (!cart) {
         throw new Error('Cart not found');
     }
-
+    const promo = await PromoModel.findOne({code : payload.code})
+    if (!promo) {
+        throw new ApiError(404 ,'promo not found');
+    }
+    console.log(promo.percent)
     cart.promoCode = payload.code ?? null;
 
-    const percent = payload.percent;
+    const percent = promo.percent;
     if (percent === undefined || isNaN(percent)) {
         throw new Error('Invalid or missing percent value for promo code');
     }
@@ -62,5 +67,6 @@ export const promoService = {
     readSinglePromo,
     deletePromo,
     updatePromo,
-    readAllPromo
+    readAllPromo,
+    checkPromoCode
 }

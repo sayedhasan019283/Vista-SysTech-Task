@@ -25,4 +25,9 @@ router.delete(
     promoController.deletePromo
 )
 
+router.post(
+    '/check-promo/:cartId',
+    promoController.checkPromoCode
+)
+
 export const promoRoute = router

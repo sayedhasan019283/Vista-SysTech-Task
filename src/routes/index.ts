@@ -5,6 +5,7 @@ import path from 'path';
 import { CatalogRoute } from '../app/modules/catalog/catalog.route';
 import { cartRouter } from '../app/modules/cart/cart.route';
 import { promoRoute } from '../app/modules/promo/promo.route';
+import { orderRoute } from '../app/modules/order/order.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -27,6 +28,10 @@ const apiRoutes = [
   {
     path: '/promo',
     route: promoRoute,
+  },
+  {
+    path: '/order',
+    route: orderRoute,
   }
 ];   
 

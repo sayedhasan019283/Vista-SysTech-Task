@@ -84,11 +84,32 @@ const updatePromo = async (req : Request, res : Response, next : NextFunction) =
         });
 }
 
+const checkPromoCode = async (req : Request, res : Response, next : NextFunction) => {
+
+    const payload = req.body;
+    const {cartId} = req.params
+
+    const result = await promoService.checkPromoCode(payload, cartId)
+
+    if (!result) {
+            return sendResponse(res, {
+                code: StatusCodes.NOT_FOUND,
+                message: "Something Went Wrong",
+            });
+        }
+        return sendResponse(res, {
+            code: StatusCodes.OK,
+            message: "Promo Code Used successfully.",
+            data: result,
+        });
+}
+
 export const promoController = {
     createPromo,
     readAllPromo,
     readSinglePromo,
     updatePromo,
-    deletePromo
+    deletePromo,
+    checkPromoCode
 
 }

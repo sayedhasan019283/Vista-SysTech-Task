@@ -1,50 +1,54 @@
 import colors from 'colors';
 import mongoose from 'mongoose';
 import { Server } from 'socket.io';
-import app from './app';
-import config from './config';
-import { errorLogger, logger } from './shared/logger';
-import { socketHelper } from './app/socket/socket';
+import app from './app'; // Express app
+import config from './config'; // Configuration
+import { errorLogger, logger } from './shared/logger'; // Logging
+import { socketHelper } from './app/socket/socket'; // Socket helpers
 
-//uncaught exception
+// Uncaught exceptions
 process.on('uncaughtException', error => {
   errorLogger.error('Unhandled Exception Detected', error);
-  process.exit(1);
+  if (server) {
+    server.close(() => process.exit(1)); // Ensure server is closed before exit
+  } else {
+    process.exit(1);
+  }
 });
 
 let server: any;
 async function main() {
   try {
+    // Connect to MongoDB
     mongoose.connect(config.mongoose.url as string);
     logger.info(colors.green('🚀 Database connected successfully'));
-    const port =
-      typeof config.port === 'number' ? config.port : Number(config.port);
+
+    // Start server
+    const port = typeof config.port === 'number' ? config.port : Number(config.port);
     server = app.listen(port, config.backendIp as string, () => {
       logger.info(
-        colors.yellow(
-          `♻️  Application listening on port http://${config.backendIp}:${port}/test`
-        )
+        colors.yellow(`♻️  Application listening on http://${config.backendIp}:${port}/test`)
       );
     });
-    //socket
+
+    // Setup Socket.IO
     const io = new Server(server, {
       pingTimeout: 60000,
-      cors: {
-        origin: '*',
-      },
+      cors: { origin: '*' },
     });
     socketHelper.socket(io);
     // @ts-ignore
-    global.io = io;
+    global.io = io; // Attach to global
+
   } catch (error) {
     errorLogger.error(colors.red('🤢 Failed to connect Database'));
   }
 
-  //handle unhandledRejection
+  // Handle unhandled rejections
   process.on('unhandledRejection', error => {
     if (server) {
       server.close(() => {
-        errorLogger.error('UnhandledRejection Detected', error);
+        errorLogger.error('Unhandled Rejection Detected', error);
         process.exit(1);
       });
     } else {
@@ -55,10 +59,15 @@ async function main() {
 
 main();
 
-//SIGTERM
+// Gracefully handle SIGTERM (shutting down server)
 process.on('SIGTERM', () => {
-  logger.info('SIGTERM IS RECEIVE');
+  logger.info('SIGTERM received');
   if (server) {
-    server.close();
+    server.close(() => {
+      logger.info('Server closed gracefully');
+      process.exit(0); // Exit after server closure
+    });
+  } else {
+    process.exit(1); // Force exit if server not running
   }
 });

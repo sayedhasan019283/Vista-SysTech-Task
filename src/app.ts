@@ -1,44 +1,47 @@
-import cors from 'cors';
 import express, { Request, Response } from 'express';
-import cookieParser from 'cookie-parser'; 
-import globalErrorHandler from './app/middlewares/globalErrorHandler';
-import router from './routes';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import path from 'path';
+import globalErrorHandler from './app/middlewares/globalErrorHandler'; // Global Error Handler
+import router from './routes'; // Your routes
 import { Morgan } from './shared/morgen';
 import notFound from './app/middlewares/notFount';
-import path from 'path';
+
 
 const app = express();
 
-// morgan
+// morgan logging
 app.use(Morgan.successHandler);
 app.use(Morgan.errorHandler);
 
-// body parser
+// CORS middleware
 app.use(cors({
   origin: '*',
   credentials: true
 }));
+
+// Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Use cookie-parser to parse cookies
+// Cookie parser
 app.use(cookieParser());
 
-// file retrieve
+// Static file serving (uploads)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// router
+// Routes
 app.use('/api/v1', router);
 
-// live response
+// Health check or any test route
 app.get('/test', (req: Request, res: Response) => {
   res.status(201).json({ message: 'Welcome to Backend Template Server' });
 });
 
-// global error handle
-app.use(globalErrorHandler);
+// Global error handler should be last
+app.use(globalErrorHandler);  // This catches all errors passed to next()
 
-// handle not found route
-app.use(notFound);
+// 404 handler (if no route matches)
+app.use(notFound); // Custom handler for 404 (optional)
 
 export default app;

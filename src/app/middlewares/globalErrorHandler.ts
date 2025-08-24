@@ -1,81 +1,34 @@
 import { ErrorRequestHandler } from 'express';
-import config from '../../config';
-import ApiError from '../../errors/ApiError';
-import handleValidationError from '../../errors/handleValidationError';
-import handleZodError from '../../errors/handleZodError';
-import handleDuplicateError from '../../errors/handleDuplicateError';
-import { errorLogger } from '../../shared/logger';
-import { IErrorMessage } from '../../types/errors.types';
+import { errorLogger } from '../../shared/logger'; // Log errors to file
+import ApiError from '../../errors/ApiError'; // Custom error class
+import config from '../../config'; // For checking environment
 
 const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
-  // Log error
-  config.env === 'development'
-    ? console.log('🚨 globalErrorHandler ~~ ', error)
-    : errorLogger.error('🚨 globalErrorHandler ~~ ', error);
+  // Log error based on environment
+  if (config.env === 'development') {
+    console.log('🚨 globalErrorHandler ~~ ', error);
+  } else {
+    errorLogger.error('🚨 globalErrorHandler ~~ ', error);
+  }
 
   let code = 500;
   let message = 'Something went wrong';
-  let errorMessages: IErrorMessage[] = [];
+  let errorMessages: { path: string; message: string; }[] = [];
 
-  // Handle ZodError
-  if (error.name === 'ZodError') {
-    const simplifiedError = handleZodError(error);
-    code = simplifiedError.code;
-    message = simplifiedError.errorMessages.map(err => err.message).join(', ');
-    errorMessages = simplifiedError.errorMessages;
-  }
-  // Handle ValidationError (e.g., Mongoose)
-  else if (error.name === 'ValidationError') {
-    const simplifiedError = handleValidationError(error);
-    code = simplifiedError.code;
-    message = simplifiedError.errorMessages.map(err => err.message).join(', ');
-    errorMessages = simplifiedError.errorMessages;
-  }
-  // Handle DuplicateError
-  else if (error.name === 'DuplicateError') {
-    const simplifiedError = handleDuplicateError(error);
-    code = simplifiedError.code;
-    message = simplifiedError.errorMessages.map(err => err.message).join(', ');
-    errorMessages = simplifiedError.errorMessages;
-  }
-  // ✅ Handle CastError (Mongoose bad ObjectId, wrong type, etc.)
-  else if (error.name === 'CastError') {
-    code = 400;
-    message = `Invalid ${error.path}: ${error.value}`;
-    errorMessages = [
-      {
-        path: error.path,
-        message: `Invalid ${error.path}: ${error.value}`,
-      },
-    ];
-  }
-  // Handle ApiError (custom)
-  else if (error instanceof ApiError) {
+  // Handle specific error types
+  if (error instanceof ApiError) {
     code = error.code;
     message = error.message || 'Something went wrong';
-    errorMessages = error.message
-      ? [{ path: '', message: error.message }]
-      : [];
+    errorMessages = [{ path: '', message }];
   }
-  // Handle generic Error
-  else if (error instanceof Error) {
-    message = error.message || 'Internal Server Error';
-    errorMessages = error.message
-      ? [{ path: '', message: error.message }]
-      : [];
-  }
+  // Other error handling can go here for Mongoose validation, CastError, etc.
 
-  // Format multiple error messages
-  const formattedMessage =
-    errorMessages.length > 1
-      ? errorMessages.map(err => err.message).join(', ')
-      : message;
-
+  // Send response
   res.status(code).json({
     code,
-    message: formattedMessage,
+    message,
     error: errorMessages,
-    stack: config.env === 'development' ? error?.stack : undefined,
+    stack: config.env === 'development' ? error?.stack : undefined, // Only in dev
   });
 };
 

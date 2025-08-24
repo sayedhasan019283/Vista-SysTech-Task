@@ -87,7 +87,7 @@ npm run dev
 
 
 The application will run on http://localhost:8080
-.
+open http://localhost:8080/test
 
 Swagger Documentation
 

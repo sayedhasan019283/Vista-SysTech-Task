@@ -42,7 +42,7 @@ const getAllOrder = catchAsync(async (req: Request, res: Response, next: NextFun
     }
     return sendResponse(res, {
             code: StatusCodes.OK,
-            message: "Cart remove Item Successfully.",
+            message: "Get All Order Successfully.",
             data: result,
         });
 })

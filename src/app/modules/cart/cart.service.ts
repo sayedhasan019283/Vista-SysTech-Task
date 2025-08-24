@@ -135,7 +135,7 @@ console.log("productFind=====>>>>", productFind)
         cart.total = cart.subTotal;
 
         // Save the updated cart after adding the new item
-        // await cart.save();
+        await cart.save();
     }
 
     console.log(cart);

@@ -28,7 +28,7 @@ Vista Systech Task is a backend application designed to manage promotions, catal
 Clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/your-username/vista-systech-task.git
+git clone https://github.com/sayedhasan019283/Vista-SysTech-Task.git
 
 
 Step 2: Install Dependencies

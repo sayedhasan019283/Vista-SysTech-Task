@@ -103,7 +103,7 @@ console.log("productFind=====>>>>", productFind)
         const totalQuantity = productExist.quantity + quantity;
         
         // Ensure price is a number
-        const price = Number(productExist.price) || 0;
+        const price = Number(productExist.price);
         
         // Update quantity and recalculate total price
         productExist.quantity = totalQuantity;

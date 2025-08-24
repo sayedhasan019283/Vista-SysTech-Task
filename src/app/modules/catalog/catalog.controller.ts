@@ -3,9 +3,10 @@ import ApiError from "../../../errors/ApiError";
 import { StatusCodes } from "http-status-codes";
 import { CatalogService } from "./catalog.service";
 import sendResponse from "../../../shared/sendResponse";
+import catchAsync from "../../../shared/catchAsync";
 
 // Create Catalog
-const createCatalogController = async (req: Request, res: Response, next: NextFunction) => {
+const createCatalogController = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const payload = req.body;
         if (!payload) {
@@ -29,10 +30,10 @@ const createCatalogController = async (req: Request, res: Response, next: NextFu
     } catch (error) {
         return next(error); // Pass the error to the global error handler
     }
-}
+})
 
 // Get All Catalogs
-const readAllCatalog = async (req: Request, res: Response, next: NextFunction) => {
+const readAllCatalog = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await CatalogService.readAllCatalog();
         if (!result || result.length === 0) {
@@ -49,10 +50,10 @@ const readAllCatalog = async (req: Request, res: Response, next: NextFunction) =
     } catch (error) {
         return next(error);
     }
-}
+})
 
 // Get Single Catalog by ID
-const readSingleCatalog = async (req: Request, res: Response, next: NextFunction) => {
+const readSingleCatalog = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { CatalogId } = req.params;
         const result = await CatalogService.readSingleCatalog(CatalogId);
@@ -70,10 +71,10 @@ const readSingleCatalog = async (req: Request, res: Response, next: NextFunction
     } catch (error) {
         return next(error);
     }
-}
+})
 
 // Update Catalog
-const updateCatalog = async (req: Request, res: Response, next: NextFunction) => {
+const updateCatalog = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { CatalogId } = req.params;
         const payload = req.body;
@@ -100,10 +101,10 @@ const updateCatalog = async (req: Request, res: Response, next: NextFunction) =>
     } catch (error) {
         return next(error);
     }
-}
+})
 
 // Delete Catalog
-const deleteCatalog = async (req: Request, res: Response, next: NextFunction) => {
+const deleteCatalog = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { CatalogId } = req.params;
         const result = await CatalogService.deleteCatalog(CatalogId);
@@ -121,7 +122,7 @@ const deleteCatalog = async (req: Request, res: Response, next: NextFunction) =>
     } catch (error) {
         return next(error);
     }
-}
+})
 
 export const CatalogController = {
     createCatalogController,

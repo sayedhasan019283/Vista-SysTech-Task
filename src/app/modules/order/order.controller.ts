@@ -2,10 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import { orderService } from "./order.service";
 import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
+import catchAsync from "../../../shared/catchAsync";
 
 
 
-const createOrder = async (req: Request, res: Response, next: NextFunction) => {
+const createOrder = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { cartId } = req.params; 
     const { name, address, phoneNumber } = req.body; 
@@ -28,10 +29,10 @@ const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   } catch (error) {
     next(error); 
   }
-};
+});
 
 
-const getAllOrder = async (req: Request, res: Response, next: NextFunction) => {
+const getAllOrder = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const result = await orderService.getAlleOrder()
     if (!result) {
         return sendResponse(res, {
@@ -44,8 +45,8 @@ const getAllOrder = async (req: Request, res: Response, next: NextFunction) => {
             message: "Cart remove Item Successfully.",
             data: result,
         });
-}
-const getSingleOrder = async (req: Request, res: Response, next: NextFunction) => {
+})
+const getSingleOrder = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
     const {orderId} = req.params
     const result = await orderService.getSingleOrder(orderId)
@@ -61,7 +62,7 @@ const getSingleOrder = async (req: Request, res: Response, next: NextFunction) =
             message: "get one Order Successfully.",
             data: result,
         });
-}
+})
 
 
 export const orderController = {

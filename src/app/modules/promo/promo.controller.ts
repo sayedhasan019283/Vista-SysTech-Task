@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { promoService } from "./promo.service";
 import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
+import catchAsync from "../../../shared/catchAsync";
 
-const createPromo = async (req : Request, res : Response, next : NextFunction) => {
+const createPromo = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
     const payload = req.body;
     const result = await promoService.createPromo(payload);
     if (!result) {
@@ -17,9 +18,9 @@ const createPromo = async (req : Request, res : Response, next : NextFunction) =
             message: "Promo Created successfully.",
             data: result,
         });
-}
+})
 
-const readAllPromo = async (req : Request, res : Response, next : NextFunction) => {
+const readAllPromo = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
     const result = await promoService.readAllPromo()
     if (!result) {
             return sendResponse(res, {
@@ -32,8 +33,8 @@ const readAllPromo = async (req : Request, res : Response, next : NextFunction) 
             message: "Promo get successfully.",
             data: result,
         });
-}
-const readSinglePromo = async (req : Request, res : Response, next : NextFunction) => {
+})
+const readSinglePromo = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
     const {promoId} = req.params
     const result = await promoService.readSinglePromo(promoId)
 
@@ -48,8 +49,8 @@ const readSinglePromo = async (req : Request, res : Response, next : NextFunctio
             message: "Promo Found successfully.",
             data: result,
         });
-}
-const deletePromo = async (req : Request, res : Response, next : NextFunction) => {
+})
+const deletePromo = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
     const {promoId} = req.params 
     const result = await promoService.deletePromo(promoId)
     if (!result) {
@@ -63,8 +64,8 @@ const deletePromo = async (req : Request, res : Response, next : NextFunction) =
             message: "Promo deleted successfully.",
             data: result,
         });
-}
-const updatePromo = async (req : Request, res : Response, next : NextFunction) => {
+})
+const updatePromo = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
 
     const payload = req.body;
     const {promoId} = req.params
@@ -82,9 +83,9 @@ const updatePromo = async (req : Request, res : Response, next : NextFunction) =
             message: "Promo updated successfully.",
             data: result,
         });
-}
+})
 
-const checkPromoCode = async (req : Request, res : Response, next : NextFunction) => {
+const checkPromoCode = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
 
     const payload = req.body;
     const {cartId} = req.params
@@ -102,7 +103,7 @@ const checkPromoCode = async (req : Request, res : Response, next : NextFunction
             message: "Promo Code Used successfully.",
             data: result,
         });
-}
+})
 
 export const promoController = {
     createPromo,

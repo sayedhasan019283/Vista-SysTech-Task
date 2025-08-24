@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { cartService } from "./cart.service";
 import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
+import catchAsync from "../../../shared/catchAsync";
 
-const createCart = async (req : Request, res : Response, next : NextFunction) => {
+const createCart = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
     const payload = req.body;
     // console.log("payload=========" ,payload)
     const result = await cartService.createCartFromDB(payload);
@@ -18,9 +19,9 @@ const createCart = async (req : Request, res : Response, next : NextFunction) =>
             message: "Cart Created Successfully.",
             data: result,
         });
-}
+})
 
-const getCartById = async (req : Request, res : Response, next : NextFunction) => {
+const getCartById = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
     const {cartId} = req.params;
     const result = await cartService.getCartByIdFromDB(cartId);
     if (!result) {
@@ -34,8 +35,8 @@ const getCartById = async (req : Request, res : Response, next : NextFunction) =
             message: "Cart Found Successfully.",
             data: result,
         });
-}
-const getCartByToken = async (req : Request, res : Response, next : NextFunction) => {
+})
+const getCartByToken = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
     const {token} = req.params;
     const result = await cartService.getCartByTokenFromDB(token) 
     if (!result) {
@@ -49,9 +50,9 @@ const getCartByToken = async (req : Request, res : Response, next : NextFunction
             message: "Cart Found Successfully.",
             data: result,
         });
-}
+})
 
-const addToCart = async (req : Request, res : Response, next : NextFunction) => {
+const addToCart = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
     const {cartId} = req.params
     const payload = req.body
     const result = await cartService.addToCartFromDB(cartId, payload);
@@ -66,9 +67,9 @@ const addToCart = async (req : Request, res : Response, next : NextFunction) => 
             message: "Cart Add Item Successfully.",
             data: result,
         });
-}
+})
 
-const deleteCart = async (req : Request, res : Response, next : NextFunction) => {
+const deleteCart = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
     const {cartId} = req.params;
     const result = cartService.deleteCartFromDB(cartId);
     if (!result) {
@@ -82,9 +83,9 @@ const deleteCart = async (req : Request, res : Response, next : NextFunction) =>
             message: "Cart deleted Successfully.",
             data: result,
         });
-}
+})
 
-const removeItemToCart = async (req : Request, res : Response, next : NextFunction) => {
+const removeItemToCart = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
     const {cartId, productId} = req.params
     
     const result = await cartService.removeItemFromCart(cartId, productId);
@@ -99,7 +100,7 @@ const removeItemToCart = async (req : Request, res : Response, next : NextFuncti
             message: "Cart remove Item Successfully.",
             data: result,
         });
-}
+})
 
 export const cartController = {
     createCart, 

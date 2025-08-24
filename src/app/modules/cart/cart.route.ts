@@ -20,7 +20,6 @@ const router = express.Router();
  *             required:
  *               - productId
  *               - quantity
- *               - price
  *             properties:
  *               productId:
  *                 type: string
@@ -100,7 +99,6 @@ router.get('/get-cart-by-token/:token', cartController.getCartByToken);
  *             required:
  *               - productId
  *               - quantity
- *               - price
  *             properties:
  *               productId:
  *                 type: string

@@ -36,7 +36,7 @@ const createCartFromDB = async (payload: CreateCartPayload) => {
       },
     },
   ]);
-    console.log(product, variant)
+    console.log("==========>>>" ,product, variant)
     
     const cartData: Partial<TCart> = {
         token,
@@ -44,7 +44,7 @@ const createCartFromDB = async (payload: CreateCartPayload) => {
             productId: new Types.ObjectId(productId),
             quantity,
             variant,
-            price
+            price : product[0].price
         }],
         promoCode: null,
         subTotal: product[0].price * quantity,
@@ -82,10 +82,21 @@ const addToCartFromDB = async (cartId: string, payload: CreateCartPayload) => {
         throw new Error('Cart not found');
     }
 
+    const product = await CatalogModel.findOne(productIdToCheck)
+    if (!product) {
+        throw new Error('product not found');
+    }
+    console.log("product=========>>>>>>>", product)
     // Check if the product already exists in the cart with the same variant
     const productExist = cart.items.find(
         (item) => item.productId.toString() === productIdToCheck.toString() && item.variant === variant
     );
+    const productFind = product.variants.find(
+  (item) => item.size!.toString() === variant
+);
+
+console.log("productFind=====>>>>", productFind)
+
 
     if (productExist) {
         // Update the quantity if product exists
@@ -112,19 +123,19 @@ const addToCartFromDB = async (cartId: string, payload: CreateCartPayload) => {
             productId: productIdToCheck,
             quantity,
             variant,
-            price: payload.price, // assuming price is included in the payload
+            price: productFind!.price, // assuming price is included in the payload
         });
 
         // Get the existing cart total
-        const existingTotal = cart.total || 0;
+        const existingTotal = cart.total;
 
         // Add the new product's total to the existing total
-        const newProductTotal = quantity * (Number(payload.price) || 0);
+        const newProductTotal = quantity * (Number(productFind!.price) || 0);
         cart.subTotal = existingTotal + newProductTotal - cart.promoDiscountTotal;
         cart.total = cart.subTotal;
 
         // Save the updated cart after adding the new item
-        await cart.save();
+        // await cart.save();
     }
 
     console.log(cart);
